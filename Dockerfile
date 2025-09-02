@@ -21,11 +21,8 @@ COPY config ./config
 
 # Copy the rest of the application
 COPY lib ./lib
-COPY test ./test
 COPY rel ./rel
-
-# Compile the application
-RUN mix do compile
+COPY deps ./deps
 
 # Build release
 RUN mix release
@@ -39,7 +36,7 @@ RUN apk add --no-cache libstdc++ openssl ncurses-libs
 WORKDIR /app
 
 # Copy the release from the build stage
-COPY --from=build /app/_build/dev/rel/ghy ./
+COPY --from=build /app/_build/dev/rel/luia ./
 
 # Set environment variables
 ENV HOME=/app
@@ -48,5 +45,5 @@ ENV HOME=/app
 EXPOSE 4000
 
 # Set the entrypoint
-ENTRYPOINT ["/app/bin/ghy"]
+ENTRYPOINT ["/app/bin/luia"]
 CMD ["start"]

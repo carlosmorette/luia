@@ -13,36 +13,52 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - default
 
-    ghy1:
+  luia1:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       - MIX_ENV=dev
       - SECRET_KEY_BASE=some_dev_secret_key
-    # ports:
-    #   - "4000:4000"
-    networks:
-      - ghy_network
+      - ENV=container
+    ports:
+       - "4000:4000"
     restart: unless-stopped
-    volumes:
-      - ghy1_data:/app/data
+    networks:
+      - default
 
-  ghy2:
+  luia2:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       - MIX_ENV=dev
       - SECRET_KEY_BASE=some_dev_secret_key
-    # ports:
-    #   - "4001:4001"
-    networks:
-      - ghy_network
+      - ENV=container
+    ports:
+       - "4001:4000"
     restart: unless-stopped
+    networks:
+      - default
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
     volumes:
-      - ghy2_data:/app/data
+       - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - luia1
+      - luia2
+    restart: unless-stopped
+    networks:
+      - default
 
 volumes:
   db_data:
+
+networks:
+  default:
